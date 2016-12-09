@@ -7,14 +7,14 @@ export  readplist,
         writeplist_string
                 
 using SimpleParser
-        
+       
 encode(key::String, obj) = string(key, " = ", encode(obj), ";")
 
-function encode(dict::Dict{Any, Any})
+function encode{K, V}(dict::Dict{K, V})
     string("{", join([encode(key, value) for (key, value) in dict]), "}")
 end
 
-function encode(array::Vector{Any})
+function encode{T}(array::Vector{T})
     string( "(", join(map(encode, array), ", "), ")")
 end
 
@@ -37,46 +37,46 @@ function parse_obj(parser::Parser)
     token_type = parser.look_ahead.typ
     lexeme = parser.look_ahead.lexeme
     
-    if token_type == NUMBER
-        match(parser, NUMBER); integer(lexeme)
-    elseif token_type == STRING
+    if     NUMBER == token_type 
+        match(parser, NUMBER); parse(lexeme)
+    elseif STRING == token_type
         match(parser, STRING); lexeme
-    elseif token_type == '('
+    elseif LPAREN == token_type
         parse_array(parser)
-    elseif token_type == '{'
+    elseif LBRACE == token_type
         parse_dict(parser)
     end
 end
 
 
 function parse_array(parser::Parser)
-    array = cell(0)
+    array = []
     
-    match(parser, '(')
-    if look_ahead_type(parser) == ')'
-        match(parser, ')')
+    match(parser, LPAREN)
+    if look_ahead_type(parser) == RPAREN
+        match(parser, RPAREN)
         return array
     end
     push!(array, parse_obj(parser))
-    while look_ahead_type(parser) != ')'
-        match(parser, ',')
+    while look_ahead_type(parser) != RPAREN
+        match(parser, COMMA)
         push!(array, parse_obj(parser))
     end
-    match(parser, ')')
+    match(parser, RPAREN)
     array
 end
 
 function parse_dict(parser::Parser)
     dict =  Dict{Any, Any}()
     
-    match(parser, '{')
-    while look_ahead_type(parser) != '}'
+    match(parser, LBRACE)
+    while look_ahead_type(parser) != RBRACE
         key = parse_obj(parser)::String
-        match(parser, '=')
+        match(parser, EQUAL)
         dict[key] = parse_obj(parser)
-        match(parser, ';')
+        match(parser, SEMICOLON)
     end
-    match(parser, '}')
+    match(parser, RBRACE)
     dict
 end
 
@@ -87,7 +87,7 @@ function readplist_string(text::String)
 end
 
 function readplist(stream::IO)
-    text = readall(stream)
+    text = readstring(stream)
     readplist_string(text)
 end
 
