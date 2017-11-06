@@ -10,11 +10,11 @@ using SimpleParser
        
 encode(key::String, obj) = string(key, " = ", encode(obj), ";")
 
-function encode{K, V}(dict::Dict{K, V})
+function encode(dict::Dict{K, V}) where {K, V}
     string("{", join([encode(key, value) for (key, value) in dict]), "}")
 end
 
-function encode{T}(array::Vector{T})
+function encode(array::Vector{T}) where T
     string( "(", join(map(encode, array), ", "), ")")
 end
 
