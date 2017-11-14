@@ -5,7 +5,9 @@ export  readplist,
         writeplist,
         writeplist_string
                 
-using SimpleParser
+include("SimpleParser.jl")
+
+using .SimpleParser
        
 encode(key::String, obj) = string(key, " = ", encode(obj), ";")
 
