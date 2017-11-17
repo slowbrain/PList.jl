@@ -89,7 +89,11 @@ using Base.Test
         @test readplist_string("(one, two, three)") == ["one", "two", "three"]
         @test readplist_string("{foo = bar;}") == Dict("foo" => "bar")
         @test readplist_string("{one = 1;}") == Dict("one" => 1)
-
+        @test readplist_string("<0fbd77 1c2735ae>") == UInt8[0x0f, 0xbd, 0x77, 0x1c, 0x27, 0x35, 0xae]
+        @test readplist_string("<ffff>") == UInt8[0xff, 0xff]
+        @test readplist_string("<00 01 02 03>") == UInt8[0x00, 0x01, 0x02, 0x03]
+        @test readplist_string("{bin = <abcdef>;}") == Dict("bin" => UInt8[0xab, 0xcd, 0xef])
+        
         dict = readplist("example.plist")
 
         @test !isempty(dict)
@@ -98,5 +102,6 @@ using Base.Test
         @test dict["Dogs"][1]["Name"] == "Scooby Doo"
         @test dict["Dogs"][1]["Age"] == 43
         @test dict["Dogs"][1]["Colors"] == ["Brown", "Black"]
+        @test dict["BinaryData"] == UInt8[0x0f, 0xbd, 0x77, 0x1c, 0x27, 0x35, 0xae]
     end
 end

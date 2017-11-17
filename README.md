@@ -1,6 +1,6 @@
 # PList
 
-A module for reading and writing OS X plist in ASCII format. The binary and XML format is not supported presently.
+A module for reading and writing OS X plists in ASCII format. This is the property list format that originated on NeXTSTEP. The binary and XML format commonly used on Mac today is presently not supported
 
 Example of plist ASCII format:
 
@@ -12,6 +12,7 @@ Example of plist ASCII format:
 	      Colors = (Brown, Black);
 	    }
 	  );
+      BinaryData = <0fbd77 1c2735ae>;
 	}
 	
     
@@ -19,6 +20,15 @@ The plists can be read and written with `readplist` and `writeplist` which are d
 
     dict = readplist("example.plist")
     writeplist("file.plist", dict)
+    
+I based the implementation on the documentation of [Old-Style ASCII Property Lists](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/PropertyLists/OldStylePlists/OldStylePLists.html) on Apple's Developer pages. Here is an example from Apple:
+
+    {
+        AnimalSmells = { pig = piggish; lamb = lambish; worm = wormy; };
+        AnimalSounds = { pig = oink; lamb = baa; worm = baa;
+                        Lisa = "Why is the worm talking like a lamb?"; };
+        AnimalColors = { pig = pink; lamb = black; worm = pink; };
+    }
 
 [![Build Status](https://travis-ci.org/ordovician/PList.jl.svg?branch=master)](https://travis-ci.org/ordovician/PList.jl)
 
