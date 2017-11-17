@@ -13,7 +13,7 @@ mutable struct Parser
 end
 
 "Check type of upcomming token"
-look_ahead_type(parser::Parser) = parser.look_ahead.typ
+look_ahead_type(parser::Parser) = parser.look_ahead.kind
 
 "Move to next token from lexer"
 function next_token(parser::Parser)

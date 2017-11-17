@@ -35,7 +35,7 @@ function encode(obj)
 end
 
 function parse_obj(parser::Parser)
-    token_type = parser.look_ahead.typ
+    token_type = parser.look_ahead.kind
     lexeme = parser.look_ahead.lexeme
     
     if     NUMBER == token_type 

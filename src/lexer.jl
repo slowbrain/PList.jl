@@ -21,26 +21,26 @@ A string of code is turned into an array of Tokens by the lexer. Each
 symbol or word in code is represented as a Token.
 """
 struct Token
-    typ::Int
+    kind::Int
     lexeme::String
 end
 
-function Token(typ::Int)
+function Token(kind::Int)
     lexeme = ""
-    if !haskey(token_name, typ)
-       lexeme = string(Char(typ))
+    if !haskey(token_name, kind)
+       lexeme = string(Char(kind))
     end
-    Token(typ, lexeme)
+    Token(kind, lexeme)
 end
 
 function show(io::IO, token::Token)  # avoids recursion into prev and next
-    token_str = if haskey(token_name, token.typ)
-        token_name[token.typ]
+    token_str = if haskey(token_name, token.kind)
+        token_name[token.kind]
     else
-        string(Char(token.typ))
+        string(Char(token.kind))
     end
 
-    lex_str = if token.lexeme != "" && token.lexeme != string(Char(token.typ))
+    lex_str = if token.lexeme != "" && token.lexeme != string(Char(token.kind))
         "($(token.lexeme))"
     else
         ""
@@ -48,7 +48,7 @@ function show(io::IO, token::Token)  # avoids recursion into prev and next
     print(io, "$token_str $lex_str")
 end
 
-==(t1::Token, t2::Token) = t1.typ == t2.typ && t1.lexeme == t2.lexeme
+==(t1::Token, t2::Token) = t1.kind == t2.kind && t1.lexeme == t2.lexeme
 
 "Keeps track of string of code we want to turn into array of tokens"
 mutable struct Lexer
