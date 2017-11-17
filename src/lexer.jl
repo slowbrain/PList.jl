@@ -1,17 +1,20 @@
 # A Lexer / Tokenizer for tokens found in plists
 
 # Token types
-const NUMBER = 1
-const STRING = 2
-const UNKNOWN = 3
-const EOF = 4
-const LPAREN = Int('(')
-const RPAREN = Int(')')
-const LBRACE = Int('{')
-const RBRACE = Int('}')
-const COMMA = Int(',')
-const EQUAL = Int('=')
-const SEMICOLON = Int(';')
+@enum(TokenType,
+    NUMBER = 1,
+    STRING = 2,
+    UNKNOWN = 3,
+    EOF    = 4,
+    LPAREN = Int('('),
+    RPAREN = Int(')'),
+    LBRACE = Int('{'),
+    RBRACE = Int('}'),
+    COMMA  = Int(','),
+    EQUAL  = Int('='),
+    SEMICOLON = Int(';'))
+
+TokenType(ch::Char) = TokenType(Int(ch))
 
 # mapping from token type to a string representation
 const token_name = Dict(NUMBER => "Number", STRING => "String", UNKNOWN => "Unknown", EOF => "EOF")
@@ -21,11 +24,11 @@ A string of code is turned into an array of Tokens by the lexer. Each
 symbol or word in code is represented as a Token.
 """
 struct Token
-    kind::Int
+    kind::TokenType
     lexeme::String
 end
 
-function Token(kind::Int)
+function Token(kind::TokenType)
     lexeme = ""
     if !haskey(token_name, kind)
        lexeme = string(Char(kind))
@@ -78,7 +81,7 @@ function next(lex::Lexer, pos::Int)
     end
 
     if in(ch, "{}(),=;")
-        (Token(Int(ch), string(ch)), pos + 1)
+        (Token(TokenType(ch), string(ch)), pos + 1)
     elseif isdigit(ch)
         range = search(buf, r"\d+", pos)
         (Token(NUMBER, buf[range]), last(range) + 1)

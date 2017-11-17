@@ -25,7 +25,7 @@ end
 
 Verify that next token is of type `token_type`, and if so, get next token.
 """
-function match(parser::Parser, token_type::Int)
+function match(parser::Parser, token_type::TokenType)
     if  look_ahead_type(parser) == token_type
         next_token(parser)
     else
