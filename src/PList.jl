@@ -9,7 +9,7 @@ include("SimpleParser.jl")
 
 using .SimpleParser
        
-encode(key::String, obj) = string(key, " = ", encode(obj), ";")
+encode(key::AbstractString, obj) = string(key, " = ", encode(obj), ";")
 
 function encode(dict::Dict{K, V}) where {K, V}
     string("{", join([encode(key, value) for (key, value) in dict]), "}")
@@ -20,12 +20,16 @@ function encode(array::Vector{T}) where T
 end
 
 # Quotes strings which are not simple alphanumeric. 
-function encode(s::String)
+function encode(s::AbstractString)
     if all(isalnum, s) && length(s) > 0 && isalpha(s[1])
         s
     else
         "\"$s\""
     end
+end
+
+function encode(binary::Vector{UInt8})
+    string("<", bytes2hex(binary), ">")
 end
 
 encode(num::Real) = string(num)
@@ -42,6 +46,8 @@ function parse_obj(parser::Parser)
         match(parser, NUMBER); parse(lexeme)
     elseif STRING == token_type
         match(parser, STRING); lexeme
+    elseif HEXBINARY == token_type
+        match(parser, HEXBINARY); parse_hexbinary(lexeme)
     elseif LPAREN == token_type
         parse_array(parser)
     elseif LBRACE == token_type
@@ -49,6 +55,7 @@ function parse_obj(parser::Parser)
     end
 end
 
+parse_hexbinary(s::AbstractString) = hex2bytes(filter(isxdigit, s))
 
 function parse_array(parser::Parser)
     array = []
@@ -81,7 +88,7 @@ function parse_dict(parser::Parser)
     dict
 end
 
-function readplist_string(text::String)
+function readplist_string(text::AbstractString)
     lexer = Lexer(text)
     parser = Parser(lexer)
     parse_obj(parser)    
@@ -92,7 +99,7 @@ function readplist(stream::IO)
     readplist_string(text)
 end
 
-function readplist(filename::String)
+function readplist(filename::AbstractString)
     open(readplist, filename)
 end
 
@@ -102,7 +109,7 @@ function writeplist(stream::IO, obj)
     print(stream, encode(obj))
 end    
 
-function writeplist(filename::String, obj)
+function writeplist(filename::AbstractString, obj)
     open(filename, "w") do stream
         writeplist(stream, obj)
     end

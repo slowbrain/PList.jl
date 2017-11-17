@@ -2,10 +2,11 @@
 
 # Token types
 @enum(TokenType,
-    NUMBER = 1,
-    STRING = 2,
-    UNKNOWN = 3,
-    EOF    = 4,
+    NUMBER    = 1,
+    STRING    = 2,
+    HEXBINARY = 3,
+    UNKNOWN   = 4,
+    EOF       = 6,
     LPAREN = Int('('),
     RPAREN = Int(')'),
     LBRACE = Int('{'),
@@ -17,7 +18,11 @@
 TokenType(ch::Char) = TokenType(Int(ch))
 
 # mapping from token type to a string representation
-const token_name = Dict(NUMBER => "Number", STRING => "String", UNKNOWN => "Unknown", EOF => "EOF")
+const token_name = Dict(NUMBER  => "Number", 
+                        STRING  => "String", 
+                        UNKNOWN => "Unknown", 
+                        EOF     => "EOF",
+                        HEXBINARY => "Binary")
 
 """
 A string of code is turned into an array of Tokens by the lexer. Each
@@ -88,6 +93,9 @@ function next(lex::Lexer, pos::Int)
     elseif ch == '"'
         npos = search(buf, '"', pos + 1) # TODO: Does not handle escaped quotes
         (Token(STRING, buf[pos + 1:npos-1]), npos + 1)
+    elseif ch == '<'
+        npos = search(buf, '>', pos + 1)
+        (Token(HEXBINARY, buf[pos + 1:npos-1]), npos + 1)
     elseif isalpha(ch)
         range = search(buf, r"\w+", pos)
         (Token(STRING, buf[range]), last(range) + 1)
