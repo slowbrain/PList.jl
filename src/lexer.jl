@@ -15,7 +15,10 @@
     EQUAL  = Int('='),
     SEMICOLON = Int(';'))
 
-TokenType(ch::Char) = TokenType(Int(ch))
+# Allows TokenType(char) and Char(tokentype) constructors needed by show() 
+import Base.convert
+convert(::Type{TokenType}, ch::Char) = TokenType(Int(ch))
+convert(::Type{Char}, t::TokenType)  = Char(Int(t))
 
 # mapping from token type to a string representation
 const token_name = Dict(NUMBER  => "Number", 
